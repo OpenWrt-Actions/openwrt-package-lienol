@@ -27,7 +27,7 @@ local function gen_outbound(node, tag)
                 local node_type = (proto and proto ~= "nil") and proto or "socks"
                 local new_port = sys.exec(string.format("echo -n $(/usr/share/%s/app.sh get_new_port auto tcp)", appname))
                 node.port = new_port
-                sys.call(string.format("/usr/share/%s/app.sh run_socks %s %s %s %s %s", 
+                sys.call(string.format("/usr/share/%s/app.sh run_socks %s %s %s %s %s > /dev/null", 
                     appname,
                     node_id,
                     "127.0.0.1",
@@ -48,7 +48,7 @@ local function gen_outbound(node, tag)
                 concurrency = (node.mux_concurrency) and tonumber(node.mux_concurrency) or 8
             },
             -- 底层传输配置
-            streamSettings = (node.protocol == "vmess") and {
+            streamSettings = (node.protocol == "vmess" or node.protocol == "socks" or node.protocol == "shadowsocks") and {
                 network = node.transport,
                 security = node.stream_security,
                 tlsSettings = (node.stream_security == "tls") and {
@@ -56,8 +56,7 @@ local function gen_outbound(node, tag)
                     serverName = node.tls_serverName,
                     allowInsecure = (node.tls_allowInsecure == "1") and true or false
                 } or nil,
-                tcpSettings = (node.transport == "tcp" and
-                    node.protocol ~= "socks") and {
+                tcpSettings = (node.transport == "tcp" and node.protocol ~= "socks") and {
                     header = {
                         type = node.tcp_guise,
                         request = {
@@ -101,18 +100,21 @@ local function gen_outbound(node, tag)
                         port = tonumber(node.port),
                         users = {
                             {
-                                id = node.VMess_id,
-                                alterId = tonumber(node.VMess_alterId),
-                                level = tonumber(node.VMess_level),
+                                id = node.vmess_id,
+                                alterId = tonumber(node.alter_id),
+                                level = tonumber(node.vmess_level),
                                 security = node.security
                             }
                         }
                     }
                 } or nil,
-                servers = (node.protocol == "socks" or node.protocol == "http") and {
+                servers = (node.protocol == "socks" or node.protocol == "http" or node.protocol == "shadowsocks") and {
                     {
                         address = node.address,
                         port = tonumber(node.port),
+                        method = node.v_ss_encrypt_method or nil,
+                        password = node.password or "",
+                        ota = node.ss_ota == '1' and true or false,
                         users = (node.username and node.password) and
                             {{user = node.username, pass = node.password}} or nil
                     }

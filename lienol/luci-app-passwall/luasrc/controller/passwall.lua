@@ -10,56 +10,57 @@ local trojan_go = require "luci.model.cbi.passwall.api.trojan_go"
 
 function index()
 	if not nixio.fs.access("/etc/config/passwall") then return end
-	entry({"admin", "vpn"}, firstchild(), "VPN", 45).dependent = false
-	entry({"admin", "vpn", "passwall", "reset_config"}, call("reset_config")).leaf = true
-	entry({"admin", "vpn", "passwall", "show"}, call("show_menu")).leaf = true
-	entry({"admin", "vpn", "passwall", "hide"}, call("hide_menu")).leaf = true
-	if nixio.fs.access("/etc/config/passwall") and
-		nixio.fs.access("/etc/config/passwall_show") then
-		entry({"admin", "vpn", "passwall"}, alias("admin", "vpn", "passwall", "settings"), _("Pass Wall"), 1).dependent = true
+	entry({"admin", "services", "passwall", "reset_config"}, call("reset_config")).leaf = true
+	entry({"admin", "services", "passwall", "show"}, call("show_menu")).leaf = true
+	entry({"admin", "services", "passwall", "hide"}, call("hide_menu")).leaf = true
+	if nixio.fs.access("/etc/config/passwall_show") then
+		entry({"admin", "services", "passwall"}, alias("admin", "services", "passwall", "settings"), _("Pass Wall"), 1).dependent = true
 	end
-	entry({"admin", "vpn", "passwall", "settings"}, cbi("passwall/global"), _("Basic Settings"), 1).dependent = true
-	entry({"admin", "vpn", "passwall", "node_list"}, cbi("passwall/node_list"), _("Node List"), 2).dependent = true
-	entry({"admin", "vpn", "passwall", "auto_switch"}, cbi("passwall/auto_switch"), _("Auto Switch"), 3).leaf = true
-	entry({"admin", "vpn", "passwall", "other"}, cbi("passwall/other", {autoapply = true}), _("Other Settings"), 93).leaf = true
+	entry({"admin", "services", "passwall", "settings"}, cbi("passwall/global"), _("Basic Settings"), 1).dependent = true
+	entry({"admin", "services", "passwall", "node_list"}, cbi("passwall/node_list"), _("Node List"), 2).dependent = true
+	entry({"admin", "services", "passwall", "auto_switch"}, cbi("passwall/auto_switch"), _("Auto Switch"), 3).leaf = true
+	entry({"admin", "services", "passwall", "other"}, cbi("passwall/other", {autoapply = true}), _("Other Settings"), 93).leaf = true
 	if nixio.fs.access("/usr/sbin/haproxy") then
-		entry({"admin", "vpn", "passwall", "haproxy"}, cbi("passwall/haproxy"), _("Load Balancing"), 94).leaf = true
+		entry({"admin", "services", "passwall", "haproxy"}, cbi("passwall/haproxy"), _("Load Balancing"), 94).leaf = true
 	end
-	entry({"admin", "vpn", "passwall", "node_subscribe"}, cbi("passwall/node_subscribe"), _("Node Subscribe"), 95).dependent = true
-	entry({"admin", "vpn", "passwall", "rule"}, cbi("passwall/rule"), _("Rule Update"), 96).leaf = true
-	entry({"admin", "vpn", "passwall", "node_config"}, cbi("passwall/node_config")).leaf = true
-	entry({"admin", "vpn", "passwall", "shunt_rules"}, cbi("passwall/shunt_rules")).leaf = true
-	entry({"admin", "vpn", "passwall", "acl"}, cbi("passwall/acl"), _("Access control"), 97).leaf = true
-	entry({"admin", "vpn", "passwall", "log"}, form("passwall/log"), _("Watch Logs"), 999).leaf = true
-	entry({"admin", "vpn", "passwall", "server"}, cbi("passwall/server/index"), _("Server-Side"), 99).leaf = true
-	entry({"admin", "vpn", "passwall", "server_user"}, cbi("passwall/server/user")).leaf = true
+	entry({"admin", "services", "passwall", "node_subscribe"}, cbi("passwall/node_subscribe"), _("Node Subscribe"), 95).dependent = true
+	entry({"admin", "services", "passwall", "rule"}, cbi("passwall/rule"), _("Rule Update"), 96).leaf = true
+	entry({"admin", "services", "passwall", "node_config"}, cbi("passwall/node_config")).leaf = true
+	entry({"admin", "services", "passwall", "shunt_rules"}, cbi("passwall/shunt_rules")).leaf = true
+	entry({"admin", "services", "passwall", "acl"}, cbi("passwall/acl"), _("Access control"), 97).leaf = true
+	entry({"admin", "services", "passwall", "log"}, form("passwall/log"), _("Watch Logs"), 999).leaf = true
+	entry({"admin", "services", "passwall", "server"}, cbi("passwall/server/index"), _("Server-Side"), 99).leaf = true
+	entry({"admin", "services", "passwall", "server_user"}, cbi("passwall/server/user")).leaf = true
 
-	entry({"admin", "vpn", "passwall", "server_user_status"}, call("server_user_status")).leaf = true
-	entry({"admin", "vpn", "passwall", "server_get_log"}, call("server_get_log")).leaf = true
-	entry({"admin", "vpn", "passwall", "server_clear_log"}, call("server_clear_log")).leaf = true
-	entry({"admin", "vpn", "passwall", "link_add_node"}, call("link_add_node")).leaf = true
-	entry({"admin", "vpn", "passwall", "get_log"}, call("get_log")).leaf = true
-	entry({"admin", "vpn", "passwall", "clear_log"}, call("clear_log")).leaf = true
-	entry({"admin", "vpn", "passwall", "status"}, call("status")).leaf = true
-	entry({"admin", "vpn", "passwall", "socks_status"}, call("socks_status")).leaf = true
-	entry({"admin", "vpn", "passwall", "connect_status"}, call("connect_status")).leaf = true
-	entry({"admin", "vpn", "passwall", "check_port"}, call("check_port")).leaf = true
-	entry({"admin", "vpn", "passwall", "ping_node"}, call("ping_node")).leaf = true
-	entry({"admin", "vpn", "passwall", "set_node"}, call("set_node")).leaf = true
-	entry({"admin", "vpn", "passwall", "copy_node"}, call("copy_node")).leaf = true
-	entry({"admin", "vpn", "passwall", "clear_all_nodes"}, call("clear_all_nodes")).leaf = true
-	entry({"admin", "vpn", "passwall", "delete_select_nodes"}, call("delete_select_nodes")).leaf = true
-	entry({"admin", "vpn", "passwall", "update_rules"}, call("update_rules")).leaf = true
-	entry({"admin", "vpn", "passwall", "luci_check"}, call("luci_check")).leaf = true
-	entry({"admin", "vpn", "passwall", "luci_update"}, call("luci_update")).leaf = true
-	entry({"admin", "vpn", "passwall", "kcptun_check"}, call("kcptun_check")).leaf = true
-	entry({"admin", "vpn", "passwall", "kcptun_update"}, call("kcptun_update")).leaf = true
-	entry({"admin", "vpn", "passwall", "brook_check"}, call("brook_check")).leaf = true
-	entry({"admin", "vpn", "passwall", "brook_update"}, call("brook_update")).leaf = true
-	entry({"admin", "vpn", "passwall", "v2ray_check"}, call("v2ray_check")).leaf = true
-	entry({"admin", "vpn", "passwall", "v2ray_update"}, call("v2ray_update")).leaf = true
-	entry({"admin", "vpn", "passwall", "trojan_go_check"}, call("trojan_go_check")).leaf = true
-	entry({"admin", "vpn", "passwall", "trojan_go_update"}, call("trojan_go_update")).leaf = true
+	entry({"admin", "services", "passwall", "server_user_status"}, call("server_user_status")).leaf = true
+	entry({"admin", "services", "passwall", "server_get_log"}, call("server_get_log")).leaf = true
+	entry({"admin", "services", "passwall", "server_clear_log"}, call("server_clear_log")).leaf = true
+	entry({"admin", "services", "passwall", "link_append_temp"}, call("link_append_temp")).leaf = true
+	entry({"admin", "services", "passwall", "link_load_temp"}, call("link_load_temp")).leaf = true
+	entry({"admin", "services", "passwall", "link_clear_temp"}, call("link_clear_temp")).leaf = true
+	entry({"admin", "services", "passwall", "link_add_node"}, call("link_add_node")).leaf = true
+	entry({"admin", "services", "passwall", "get_log"}, call("get_log")).leaf = true
+	entry({"admin", "services", "passwall", "clear_log"}, call("clear_log")).leaf = true
+	entry({"admin", "services", "passwall", "status"}, call("status")).leaf = true
+	entry({"admin", "services", "passwall", "socks_status"}, call("socks_status")).leaf = true
+	entry({"admin", "services", "passwall", "connect_status"}, call("connect_status")).leaf = true
+	entry({"admin", "services", "passwall", "check_port"}, call("check_port")).leaf = true
+	entry({"admin", "services", "passwall", "ping_node"}, call("ping_node")).leaf = true
+	entry({"admin", "services", "passwall", "set_node"}, call("set_node")).leaf = true
+	entry({"admin", "services", "passwall", "copy_node"}, call("copy_node")).leaf = true
+	entry({"admin", "services", "passwall", "clear_all_nodes"}, call("clear_all_nodes")).leaf = true
+	entry({"admin", "services", "passwall", "delete_select_nodes"}, call("delete_select_nodes")).leaf = true
+	entry({"admin", "services", "passwall", "update_rules"}, call("update_rules")).leaf = true
+	entry({"admin", "services", "passwall", "luci_check"}, call("luci_check")).leaf = true
+	entry({"admin", "services", "passwall", "luci_update"}, call("luci_update")).leaf = true
+	entry({"admin", "services", "passwall", "kcptun_check"}, call("kcptun_check")).leaf = true
+	entry({"admin", "services", "passwall", "kcptun_update"}, call("kcptun_update")).leaf = true
+	entry({"admin", "services", "passwall", "brook_check"}, call("brook_check")).leaf = true
+	entry({"admin", "services", "passwall", "brook_update"}, call("brook_update")).leaf = true
+	entry({"admin", "services", "passwall", "v2ray_check"}, call("v2ray_check")).leaf = true
+	entry({"admin", "services", "passwall", "v2ray_update"}, call("v2ray_update")).leaf = true
+	entry({"admin", "services", "passwall", "trojan_go_check"}, call("trojan_go_check")).leaf = true
+	entry({"admin", "services", "passwall", "trojan_go_update"}, call("trojan_go_update")).leaf = true
 end
 
 local function http_write_json(content)
@@ -69,12 +70,12 @@ end
 
 function reset_config()
 	luci.sys.call('[ -f "/usr/share/passwall/config.default" ] && cp -f /usr/share/passwall/config.default /etc/config/passwall && /etc/init.d/passwall reload')
-	luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall"))
+	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "passwall"))
 end
 
 function show_menu()
 	luci.sys.call("touch /etc/config/passwall_show")
-	luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall"))
+	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "passwall"))
 end
 
 function hide_menu()
@@ -82,9 +83,38 @@ function hide_menu()
 	luci.http.redirect(luci.dispatcher.build_url("admin", "status", "overview"))
 end
 
-function link_add_node()
+function link_append_temp()
 	local link = luci.http.formvalue("link")
-	luci.sys.call('rm -f /tmp/links.conf && echo "' .. link .. '" >> /tmp/links.conf')
+	local lfile = "/tmp/links.conf"
+	local ret, ldata="empty", {}
+	luci.sys.call('touch ' .. lfile .. ' && echo \'' .. link .. '\' >> ' .. lfile)
+	ret = luci.sys.exec([[awk -F'://' 'BEGIN{ all=0 } /.{2,9}:\/\/.{4,}$/ {gsub(/:\/\/.*$/,""); arr[$0]++; all++ } END { for(typ in arr) { printf("%s: %d, ", typ, arr[typ]) }; printf("\ntotal: %d", all) }' ]] .. lfile)
+	luci.http.prepare_content("application/json")
+	luci.http.write_json({counter = ret})
+end
+
+function link_load_temp()
+	local lfile = "/tmp/links.conf"
+	local ret, ldata="empty", {}
+	ldata[#ldata+1] = nixio.fs.readfile(lfile) or "_nofile_"
+	if ldata[1] == "" then
+		ldata[1] = "_nodata_"
+	else
+		ret = luci.sys.exec([[awk -F'://' 'BEGIN{ all=0 } /.{2,9}:\/\/.{4,}$/ {gsub(/:\/\/.*$/,""); arr[$0]++; all++ } END { for(typ in arr) { printf("%s: %d, ", typ, arr[typ]) }; printf("\ntotal: %d", all) }' ]] .. lfile)
+	end
+	luci.http.prepare_content("application/json")
+	luci.http.write_json({counter = ret, data = ldata})
+end
+
+function link_clear_temp()
+	local lfile = "/tmp/links.conf"
+	luci.sys.call('cat /dev/null > ' .. lfile)
+end
+
+function link_add_node()
+	local lfile = "/tmp/links.conf"
+	local link = luci.http.formvalue("link")
+	luci.sys.call('echo \'' .. link .. '\' >> ' .. lfile)
 	luci.sys.call("lua /usr/share/passwall/subscribe.lua add log")
 end
 
@@ -168,7 +198,7 @@ function set_node()
 	ucic:set(appname, "@global[0]", protocol .. "_node" .. number, section)
 	ucic:commit(appname)
 	luci.sys.call("/etc/init.d/passwall restart > /dev/null 2>&1 &")
-	luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall", "log"))
+	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "passwall", "log"))
 end
 
 function copy_node()
