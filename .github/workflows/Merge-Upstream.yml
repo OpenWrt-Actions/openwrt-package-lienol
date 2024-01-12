@@ -38,7 +38,7 @@ jobs:
         git config --global --list
 
     - name: Load upstream commits
-      run: git pull https://github.com/xiaorouji/openwrt-passwall.git --log --no-commit
+      run: git pull https://github.com/xiaorouji/openwrt-passwall.git --log --no-commit --allow-unrelated-histories
 
     - name: Apply commit changes
       run: |
